@@ -2,7 +2,6 @@
 
 A web-based tool to visualize various pathfinding algorithms like A* Search, Breadth-First Search (BFS), and Depth-First Search (DFS) on a customizable grid. This project provides an interactive way to understand how different search algorithms explore a grid to find the shortest path.
 
-
 ## 🚀 Features
 
 * **Algorithm Visualization:** Watch A* Search, BFS, and DFS in real-time.
@@ -43,31 +42,42 @@ A web-based tool to visualize various pathfinding algorithms like A* Search, Bre
 * **Frontend:** HTML5, CSS3, JavaScript (ES6+)
 * **Graphics:** HTML5 Canvas
 * **Database:** Firebase Realtime Database (v9 Compat Mode)
+* **Deployment:** Open `index.html` in any modern browser—no installation required
 
-## 🔧 Running Locally & Firebase Setup
+## 📋 Getting Started
 
-You can run this project by simply opening the `index.html` file in your browser.
+Simply open the `index.html` file in your web browser. The application runs entirely client-side and works offline.
 
-**To enable the Save/Load feature, you must configure Firebase:**
+**Optional Firebase Integration:**
+To enable cloud-based save/load functionality, configure Firebase in `app.js` with your project credentials. Update the database rules to allow read/write access to the `pathfinding-configs` node.
 
-The project code includes a `firebaseConfig` object, but it will not work unless you set up the database rules in your own Firebase project.
+## 🎮 Grid Legend
 
-1.  **Create a Firebase Project:** Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project.
-2.  **Add a Web App:** Add a new Web App to your project and copy the `firebaseConfig` object.
-3.  **Update `app.js`:** Paste your `firebaseConfig` object at the top of `app.js`, replacing the existing one.
-4.  **Set Database Rules:**
-    * In your Firebase project, go to **Build** > **Realtime Database**.
-    * Click the **Rules** tab.
-    * To allow your app to save and load configurations, you *must* update the rules. For testing, you can use the following (this is insecure and not for production):
+| Symbol | Meaning |
+|--------|---------|
+| White | Empty Cell |
+| Black | Obstacle/Wall |
+| Green | Start Point |
+| Red | Goal Point |
+| Light Blue | Open Set (Exploring) |
+| Light Yellow | Closed Set (Explored) |
+| Purple | Final Path |
 
-    ```json
-    {
-      "rules": {
-        "pathfinding-configs": {
-          ".read": true,
-          ".write": true
-        }
-      }
-    }
-    ```
-5.  **Publish** the rules. The "Save Config" and "Load Config" buttons will now work.
+## 🧠 Algorithm Comparison
+
+| Algorithm | Best For | Optimal Path | Data Structure |
+|-----------|----------|--------------|-----------------|
+| **A\*** | Efficient pathfinding with heuristics | ✅ Yes | Priority Queue |
+| **BFS** | Shortest path in unweighted graphs | ✅ Yes | Queue (FIFO) |
+| **DFS** | Memory-efficient exploration | ❌ No | Stack (LIFO) |
+
+## 📊 Performance Tracking
+
+The visualizer displays real-time statistics:
+* **Nodes Visited:** Total cells explored during the search
+* **Path Length:** Number of cells in the final path
+* **Time Taken:** Execution time in milliseconds
+
+---
+
+**Version:** 1.0 | **Status:** Fully Functional ✅
