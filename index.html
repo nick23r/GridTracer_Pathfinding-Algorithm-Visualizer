@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Algorithm Visualizer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pathfinding Algorithm Visualizer</h1>
+            <p class="subtitle">Visualize various search algorithms in action</p>
+        </header>
+
+        <div class="main-content">
+            <div class="canvas-section">
+                <div class="canvas-container">
+                    <canvas id="gridCanvas"></canvas>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="status-display">
+                        <span class="label">Status:</span>
+                        <span id="statusText" class="status-value">Ready</span>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Nodes Visited:</span>
+                            <span id="nodesVisited" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Path Length:</span>
+                            <span id="pathLength" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Time Taken:</span>
+                            <span id="timeTaken" class="stat-value">0ms</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Algorithm:</span>
+                            <span id="heuristicType" class="stat-value">A* Search (Best-First)</span>
+                        </div>
+                    </div>
+
+                    <div class="algorithm-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Path Optimality:</span>
+                            <span id="optimality" class="detail-value detail-value--optimal">Optimal</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Time Complexity:</span>
+                            <span id="timeComplexity" class="detail-value">O(E log V) in practice</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Open Set Structure:</span>
+                            <span id="openSetStructure" class="detail-value">Priority Queue (F-Score)</span>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3>Grid Configuration</h3>
+                    <div class="form-group">
+                        <label for="gridWidth" class="form-label">Grid Width:</label>
+                        <input type="number" id="gridWidth" class="form-control" value="30" min="10" max="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="gridHeight" class="form-label">Grid Height:</label>
+                        <input type="number" id="gridHeight" class="form-control" value="20" min="10" max="40">
+                    </div>
+                    <button class="btn btn--secondary btn--full-width" id="applyGridSize">Apply Grid Size</button>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Grid Controls</h3>
+                    <button class="btn btn--secondary btn--full-width" id="generateObstacles">Generate Random Obstacles</button>
+                    <button class="btn btn--outline btn--full-width" id="clearGrid">Clear Grid</button>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Algorithm Controls</h3>
+                    <div class="form-group">
+                        <label for="algorithmSelect" class="form-label">Select Algorithm:</label>
+                        <select id="algorithmSelect" class="form-control">
+                            <option value="A_STAR">A* Search (Best-First)</option>
+                            <option value="BFS">Breadth-First Search (Queue)</option>
+                            <option value="DFS">Depth-First Search (Stack)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn btn--primary btn--full-width" id="findPath">Find Path</button>
+                    <button class="btn btn--primary btn--full-width" id="animateSearch">Animate Search</button>
+                    
+                    <div class="form-group">
+                        <label for="animationSpeed" class="form-label">Animation Speed: <span id="speedValue">1.0x</span></label>
+                        <input type="range" id="animationSpeed" class="speed-slider" min="1" max="20" value="10" step="1">
+                        <div class="speed-labels">
+                            <span>0.1x</span>
+                            <span>2x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>Firebase Storage</h3>
+                    <div class="form-group">
+                        <label for="configName" class="form-label">Configuration Name:</label>
+                        <input type="text" id="configName" class="form-control" placeholder="My Grid Config">
+                    </div>
+                    <button class="btn btn--secondary btn--full-width" id="saveConfig">Save to Firebase</button>
+                    <button class="btn btn--outline btn--full-width" id="loadConfig">Load from Firebase</button>
+                    <div id="firebaseStatus" class="firebase-status"></div>
+                </div>
+
+                <div class="panel-section legend">
+                    <h3>Legend</h3>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f0f0f0; border: 1px solid #ccc;"></div>
+                        <span>Empty Cell</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #000000;"></div>
+                        <span>Obstacle (Left Click)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #00ff00;"></div>
+                        <span>Start Point (Right Click)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ff0000;"></div>
+                        <span>Goal Point (Ctrl + Click)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #add8e6;"></div>
+                        <span>Open Set (Evaluating)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ffffe0;"></div>
+                        <span>Closed Set (Evaluated)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #800080;"></div>
+                        <span>Final Path</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    
+    <script src="app.js"></script>
+</body>
+</html>
