@@ -692,19 +692,19 @@ function updateAlgorithmDetails() {
         case 'A_STAR':
             optimalityEl.textContent = 'Optimal (Guarantees Shortest Path)';
             optimalityEl.classList.add('detail-value--optimal');
-            complexityEl.textContent = 'O(E log V) in practice';
+            complexityEl.textContent = 'O(b^d) in practice';
             structureEl.textContent = 'Priority Queue (F-Score)';
             break;
         case 'BFS':
             optimalityEl.textContent = 'Optimal (Guarantees Shortest Path)';
             optimalityEl.classList.add('detail-value--optimal');
-            complexityEl.textContent = 'O(V + E) or O(Grid Size)';
+            complexityEl.textContent = 'O(b^d) ';
             structureEl.textContent = 'Queue (FIFO)';
             break;
         case 'DFS':
             optimalityEl.textContent = 'Non-Optimal (Finds a path quickly)';
             optimalityEl.classList.add('detail-value--non-optimal');
-            complexityEl.textContent = 'O(V + E) or O(Grid Size)';
+            complexityEl.textContent = 'O(b^d) ';
             structureEl.textContent = 'Stack (LIFO)';
             break;
     }
@@ -844,3 +844,4 @@ speedSlider.addEventListener('input', (e) => {
 
 // Initialize on load
 initGrid();
+
