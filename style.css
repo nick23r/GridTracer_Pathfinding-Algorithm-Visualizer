@@ -594,7 +594,7 @@ select.form-control {
 
 .detail-label {
     font-weight: 600;
-    color: var(--color-text);
+    color: white;
     flex-shrink: 0; /* Prevents label from shrinking too much */
 }
 
@@ -1340,4 +1340,5 @@ header h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 
