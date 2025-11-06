@@ -1,5 +1,5 @@
 # GridTracer
-Pathfinding Algorithm Visualizer
+#Pathfinding Algorithm Visualizer
 
 A web-based tool to visualize various pathfinding algorithms like A* Search, Breadth-First Search (BFS), and Depth-First Search (DFS) on a customizable grid. This project provides an interactive way to understand how different search algorithms explore a grid to find the shortest path.
 
