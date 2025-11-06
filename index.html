@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GridTracer</title>
+    <title>Pathfinding Algorithm Visualizer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>GridTracer</h1>
+            <h1>Pathfinding Algorithm Visualizer</h1>
             <p class="subtitle">Visualize various search algorithms in action</p>
         </header>
 
@@ -57,8 +57,51 @@
                             <span id="openSetStructure" class="detail-value">Priority Queue (F-Score)</span>
                         </div>
                     </div>
+                </div>
+
+                <div class="info-panel comparison-panel" id="comparison-panel">
+                    <h3>Algorithm Comparison</h3>
+                    <table class="comparison-table" id="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>Nodes Visited</th>
+                                <th>Path Length</th>
+                                <th>Time Taken (ms)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comparison-table-body">
+                            </tbody>
+                    </table>
+                    
+                    <div class="comparison-note">
+    <p><strong>Note: A Deep Dive on Time Differences</strong></p>
+    
+    <p>
+        <strong>1. The Comparison Table (A "Warm" Average):</strong><br>
+        The times in this table are an <strong>average of 100 runs</strong>. This is a scientific practice called <strong>benchmarking</strong>, which is crucial for two reasons:
+    </p>
+
+    <ul>
+        <li>
+            <strong>JavaScript JIT Compilation:</strong> The first time you run a JavaScript function, the engine has to interpret, analyze, and compile it (a "cold" run). Subsequent runs use this highly-optimized, compiled code ("warm" runs), which are much faster. By averaging 100 runs, we are measuring the algorithm's true, "warm" speed, not the one-time "cold" startup cost.
+        </li>
+        <li>
+            <strong>System "Noise":</strong> Your computer is doing thousands of things at once (OS tasks, background processes, etc.). These create tiny, random delays. A single run might be 0.1ms, and the next 0.3ms, just due to random luck. Averaging 100 runs smooths out this "noise," giving a stable and accurate number.
+        </li>
+    </ul>
+
+    <p>
+        <strong>2. The Top Panel (A "Cold" Single Run):</strong><br>
+        The "Time Taken" stat at the top measures only the <strong>single run that was visualized</strong>. This was likely a "cold" run, so its time includes all the initial compilation and setup overhead.
+    </p>
+
+    <p>
+        <strong>In short:</strong> The top panel shows the "real-world" time for the first-ever run. The table below shows the more accurate, "scientific" speed of the algorithm once it's fully optimized.
+    </p>
+</div>
                     </div>
-            </div>
+                </div>
 
             <div class="control-panel">
                 <div class="panel-section">

@@ -88,6 +88,9 @@ function initGrid() {
   updateStatus('Ready');
   resetStats();
   updateAlgorithmLabel(); // Initial label update
+  
+  // Hide comparison panel on init
+  document.getElementById('comparison-panel').style.display = 'none';
 }
 
 // Draw Grid
@@ -186,6 +189,7 @@ canvas.addEventListener('click', (e) => {
   }
   
   clearVisuals(); // Clear path/visited state if grid changes
+  document.getElementById('comparison-panel').style.display = 'none'; // Hide comparison panel
   drawGrid();
 });
 
@@ -204,6 +208,7 @@ canvas.addEventListener('contextmenu', (e) => {
   grid[cellPos.y][cellPos.x].type = CELL_TYPE.START;
   
   clearVisuals(); // Clear path/visited state if grid changes
+  document.getElementById('comparison-panel').style.display = 'none'; // Hide comparison panel
   drawGrid();
 });
 
@@ -238,6 +243,8 @@ function getNeighbors(cell) {
 }
 
 // Universal Search Algorithm (A*, BFS, DFS)
+// This function is now "pure" - it does not modify the grid's visual state (status, isPath)
+// It only calculates and returns the results.
 function searchAlgorithm() {
   if (!startCell || !goalCell) {
     updateStatus('Please set start and goal points');
@@ -246,7 +253,8 @@ function searchAlgorithm() {
   
   const startTime = performance.now();
   
-  // Reset grid state for a fresh search
+  // Reset grid CALCULATION state for a fresh search
+  // Visual state (status, isPath) is reset by clearVisuals() before this is called
   for (let y = 0; y < gridHeight; y++) {
     for (let x = 0; x < gridWidth; x++) {
       const cell = grid[y][x];
@@ -254,8 +262,6 @@ function searchAlgorithm() {
       cell.h = 0;
       cell.f = Infinity;
       cell.parent = null;
-      cell.status = null;
-      cell.isPath = false;
     }
   }
   
@@ -270,8 +276,6 @@ function searchAlgorithm() {
   const openSet = [start];
   const closedSet = new Set();
   const visitedOrder = []; 
-  
-  start.status = 'open';
   
   while (openSet.length > 0) {
     let current;
@@ -305,7 +309,7 @@ function searchAlgorithm() {
       let temp = current;
       while (temp) {
         path.unshift(temp);
-        temp.isPath = true; 
+        // temp.isPath = true; // REMOVED: This is now handled by the caller
         temp = temp.parent;
       }
       
@@ -325,7 +329,7 @@ function searchAlgorithm() {
     } 
 
     closedSet.add(`${current.x},${current.y}`);
-    current.status = 'closed';
+    // current.status = 'closed'; // REMOVED: Visual state
     visitedOrder.push({ x: current.x, y: current.y, status: 'closed' });
     
     // 3. Check neighbors
@@ -341,7 +345,7 @@ function searchAlgorithm() {
               continue;
           }
           neighbor.parent = current;
-          neighbor.status = 'open';
+          // neighbor.status = 'open'; // REMOVED: Visual state
           
           openSet.push(neighbor); // Pushes to back for both BFS (FIFO) and DFS (LIFO .pop() will get it)
 
@@ -353,7 +357,7 @@ function searchAlgorithm() {
              let temp = neighbor;
              while (temp) {
                  path.unshift(temp);
-                 temp.isPath = true; 
+                 // temp.isPath = true; // REMOVED: Visual state
                  temp = temp.parent;
              }
              const endTime = performance.now();
@@ -368,7 +372,7 @@ function searchAlgorithm() {
       
       if (!openSet.includes(neighbor)) {
         openSet.push(neighbor);
-        neighbor.status = 'open';
+        // neighbor.status = 'open'; // REMOVED: Visual state
         visitedOrder.push({ x: neighbor.x, y: neighbor.y, status: 'open' });
       } else if (tentativeG >= neighbor.g) {
         continue;
@@ -395,18 +399,38 @@ function findPath() {
   if (isAnimating) return;
   
   updateStatus('Searching...');
-  clearVisuals();
+  clearVisuals(); // Resets status and isPath to null/false
 
-  // Run searchAlgorithm - this function now modifies the grid directly
+  // Run searchAlgorithm - this function now returns data, doesn't modify grid visuals
   const result = searchAlgorithm();
   
   if (result) {
+    // Apply visual state for the *selected* algorithm
+    for (const node of result.visitedOrder) {
+        if (grid[node.y] && grid[node.y][node.x]) { // Add boundary check
+            grid[node.y][node.x].status = node.status;
+        }
+    }
+    
     if (result.path) {
       updateStatus('Path found!');
       updateStats(result.nodesVisited, result.path.length, result.timeTaken);
+      
+      // Apply path visual state
+      for (const node of result.path) {
+          if (grid[node.y] && grid[node.y][node.x]) { // Add boundary check
+              grid[node.y][node.x].isPath = true;
+          }
+      }
+      
+      // Run comparison
+      runComparison(); // <<< NEW
+      
     } else {
       updateStatus('No path found');
       updateStats(result.nodesVisited, 0, result.timeTaken);
+      // Hide comparison panel if no path is found
+      document.getElementById('comparison-panel').style.display = 'none'; // <<< NEW
     }
     
     // Just draw the grid, all states are set
@@ -424,6 +448,7 @@ async function animateSearch() {
   
   // 1. Run the search to get the results, but clear visuals first
   clearVisuals();
+  document.getElementById('comparison-panel').style.display = 'none';
   const result = searchAlgorithm();
   
   // 2. Clear visuals again to start animation from a clean slate
@@ -435,7 +460,9 @@ async function animateSearch() {
     for (let i = 0; i < result.visitedOrder.length; i++) {
       const node = result.visitedOrder[i];
       // Set the visual state on the actual grid object
-      grid[node.y][node.x].status = node.status; 
+      if (grid[node.y] && grid[node.y][node.x]) { // Add boundary check
+        grid[node.y][node.x].status = node.status; 
+      }
       drawGrid();
       await sleep(50 / animationSpeed);
     }
@@ -444,21 +471,102 @@ async function animateSearch() {
     if (result.path) {
       for (let i = 0; i < result.path.length; i++) {
         const node = result.path[i];
-        // Set the path flag on the actual grid object
-        grid[node.y][node.x].isPath = true; 
+         if (grid[node.y] && grid[node.y][node.x]) { // Add boundary check
+            // Set the path flag on the actual grid object
+            grid[node.y][node.x].isPath = true; 
+         }
         drawGrid();
         await sleep(100 / animationSpeed);
       }
       updateStatus('Path found!');
       updateStats(result.nodesVisited, result.path.length, result.timeTaken);
+
+      runComparison(); // <<< NEW
     } else {
       updateStatus('No path found');
       updateStats(result.nodesVisited, 0, result.timeTaken);
+      // Hide comparison panel if no path is found
+      document.getElementById('comparison-panel').style.display = 'none'; // <<< NEW
     }
   }
   
   isAnimating = false;
 }
+
+// NEW FUNCTION: Run all algorithms and display comparison
+function runComparison() {
+    const comparisonPanel = document.getElementById('comparison-panel');
+    const tableBody = document.getElementById('comparison-table-body');
+
+    if (!startCell || !goalCell) {
+        comparisonPanel.style.display = 'none';
+        return;
+    }
+    
+    // Show panel and set loading state
+    comparisonPanel.style.display = 'block';
+    tableBody.innerHTML = '<tr><td colspan="4">Running comparisons (Averaging 100 runs)...</td></tr>'; // Updated text
+    
+    // Save the user's currently selected algorithm
+    const originalAlgorithm = currentAlgorithm;
+    
+    const algorithmsToTest = [
+        { id: 'A_STAR', name: 'A* Search' },
+        { id: 'BFS', name: 'BFS' },
+        { id: 'DFS', name: 'DFS' }
+    ];
+    
+    const NUM_RUNS = 100; // <<< NEW: Number of runs to average
+
+    let resultsHTML = '';
+    
+    // Run tests sequentially. Use setTimeout to allow UI to update with "Loading..."
+    setTimeout(() => {
+        try {
+            for (const algo of algorithmsToTest) {
+                currentAlgorithm = algo.id;
+                
+                let totalTime = 0;
+                let finalPathLength = 0;
+                let finalNodesVisited = 0;
+                
+                // Run the search multiple times to get an average time
+                for (let i = 0; i < NUM_RUNS; i++) {
+                    const result = searchAlgorithm(); 
+                    
+                    // We only care about the time for the average, but capture the deterministic stats once
+                    totalTime += result.timeTaken;
+                    if (i === 0) {
+                        finalPathLength = result.path ? result.path.length : 'N/A';
+                        finalNodesVisited = result.nodesVisited;
+                    }
+                }
+                
+                const averageTime = totalTime / NUM_RUNS; // Calculate the average
+                
+                resultsHTML += `<tr>
+                    <td>${algo.name}</td>
+                    <td>${finalNodesVisited}</td>
+                    <td>${finalPathLength}</td>
+                    <td>${averageTime.toFixed(3)}ms (Avg of ${NUM_RUNS})</td> 
+                </tr>`;
+            }
+            
+            // Restore original algorithm
+            currentAlgorithm = originalAlgorithm;
+            
+            // Update table
+            tableBody.innerHTML = resultsHTML;
+
+        } catch (e) {
+            console.error("Error during comparison:", e);
+            tableBody.innerHTML = '<tr><td colspan="4">Error during comparison.</td></tr>';
+            // Restore original algorithm
+            currentAlgorithm = originalAlgorithm;
+        }
+    }, 10); // 10ms delay to free up UI thread
+}
+
 
 // Helper: Sleep function
 function sleep(ms) {
@@ -471,7 +579,7 @@ function clearVisuals() {
     for (let x = 0; x < gridWidth; x++) {
       grid[y][x].status = null;
       grid[y][x].isPath = false;
-      grid[y][x].parent = null;
+      grid[y][x].parent = null; // Also clear parent to prevent issues
     }
   }
 }
@@ -480,7 +588,7 @@ function clearVisuals() {
 function generateRandomObstacles() {
   if (isAnimating) return;
   
-  clearGrid();
+  clearGrid(); // This will also hide the comparison panel
   
   const obstacleCount = Math.floor((gridWidth * gridHeight) * 0.3);
   
@@ -518,6 +626,7 @@ function clearGrid() {
   drawGrid();
   updateStatus('Grid cleared');
   resetStats();
+  document.getElementById('comparison-panel').style.display = 'none'; // Hide comparison panel
 }
 
 // Apply Grid Size
@@ -533,7 +642,7 @@ function applyGridSize() {
   document.getElementById('gridWidth').value = gridWidth;
   document.getElementById('gridHeight').value = gridHeight;
   
-  initGrid();
+  initGrid(); // This will clear and hide the comparison panel
   updateStatus('Grid size updated');
 }
 
@@ -583,19 +692,19 @@ function updateAlgorithmDetails() {
         case 'A_STAR':
             optimalityEl.textContent = 'Optimal (Guarantees Shortest Path)';
             optimalityEl.classList.add('detail-value--optimal');
-            complexityEl.textContent = 'O(b^d) in practice';
-            structureEl.textContent = 'Priority Queue';
+            complexityEl.textContent = 'O(E log V) in practice';
+            structureEl.textContent = 'Priority Queue (F-Score)';
             break;
         case 'BFS':
             optimalityEl.textContent = 'Optimal (Guarantees Shortest Path)';
             optimalityEl.classList.add('detail-value--optimal');
-            complexityEl.textContent = 'O(b^d)';
+            complexityEl.textContent = 'O(V + E) or O(Grid Size)';
             structureEl.textContent = 'Queue (FIFO)';
             break;
         case 'DFS':
             optimalityEl.textContent = 'Non-Optimal (Finds a path quickly)';
             optimalityEl.classList.add('detail-value--non-optimal');
-            complexityEl.textContent = 'O(b^d)';
+            complexityEl.textContent = 'O(V + E) or O(Grid Size)';
             structureEl.textContent = 'Stack (LIFO)';
             break;
     }
@@ -718,6 +827,7 @@ algorithmSelect.addEventListener('change', (e) => {
     currentAlgorithm = e.target.value;
     updateAlgorithmLabel(); // This updates the new details section
     clearVisuals();
+    document.getElementById('comparison-panel').style.display = 'none'; // Hide comparison panel
     drawGrid();
     updateStatus(`${document.getElementById('heuristicType').textContent} selected.`);
 });

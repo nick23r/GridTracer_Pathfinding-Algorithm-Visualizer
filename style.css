@@ -581,7 +581,7 @@ select.form-control {
     /* Uses existing CSS variables for spacing and separation */
     margin-top: var(--space-8);
     padding-top: var(--space-8);
-    border-top: 1px solid var(--color-gray-200);
+    border-top: 1px solid var(--color-card-border-inner);
 }
 
 .detail-item {
@@ -594,15 +594,14 @@ select.form-control {
 
 .detail-label {
     font-weight: 600;
-    font-size:1rem;
-    color: white;
+    color: var(--color-text);
     flex-shrink: 0; /* Prevents label from shrinking too much */
 }
 
 .detail-value {
     font-weight: 400;
-    font-size:1rem;
     text-align: right;
+    color: var(--color-text-secondary);
 }
 
 /* --- Highlighting Optimality Status --- */
@@ -610,9 +609,7 @@ select.form-control {
 /* Style for Optimal paths (A*, BFS) */
 .detail-value--optimal {
     font-weight: 700;
-    color: var(--color-teal-300); /* Use a success/bright color (e.g., Teal) */
-    /* You can add a subtle background here if you want: */
-    /* background-color: rgba(50, 184, 198, 0.1); */
+    color: var(--color-success); /* Use a success/bright color (e.g., Teal) */
     padding: 2px 4px;
     border-radius: var(--radius-sm);
 }
@@ -620,9 +617,7 @@ select.form-control {
 /* Style for Non-Optimal paths (DFS) */
 .detail-value--non-optimal {
     font-weight: 700;
-    color: #ff8c00; /* Use a warning/caution color (e.g., Dark Orange) */
-    /* You can add a subtle background here if you want: */
-    /* background-color: rgba(255, 140, 0, 0.1); */
+    color: var(--color-warning); /* Use a warning/caution color (e.g., Dark Orange) */
     padding: 2px 4px;
     border-radius: var(--radius-sm);
 }
@@ -1038,11 +1033,39 @@ header h1 {
   flex-direction: column;
   gap: var(--space-4);
 }
+.comparison-note {
+    /* Spacing */
+    margin-top: var(--space-12);
+    padding: var(--space-12);
+
+    /* Appearance */
+    background-color: var(--color-secondary); /* Uses your existing theme's secondary color */
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-card-border-inner);
+}
+
+.comparison-note p {
+    font-size:2;
+    color: white;
+    margin: 0; /* Removes default <p> margin */
+    line-height: 1.4; /* Improves readability */
+}
+
+.comparison-note p strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+}
 
 .stat-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
+}
+
+.comparison-note ul {
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
+    padding-left: var(--space-20); 
 }
 
 .stat-value {
@@ -1253,6 +1276,43 @@ header h1 {
   color: var(--color-error);
 }
 
+/* --- NEW: Comparison Panel Styles --- */
+.comparison-panel {
+    display: none; /* Hidden by default */
+}
+
+.comparison-panel h3 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-16);
+    color: var(--color-text);
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--space-16);
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: var(--space-8) var(--space-12);
+    border: 1px solid var(--color-card-border-inner);
+    text-align: left;
+    font-size: var(--font-size-sm);
+}
+
+.comparison-table th {
+    background-color: var(--color-secondary);
+    font-weight: var(--font-weight-semibold);
+}
+
+.comparison-table tbody tr:nth-child(even) {
+    background-color: var(--color-background);
+}
+/* --- END: New Styles --- */
+
+
 @media (max-width: 1200px) {
   .main-content {
     flex-direction: column;
@@ -1280,3 +1340,4 @@ header h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
