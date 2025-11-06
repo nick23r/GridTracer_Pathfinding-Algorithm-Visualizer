@@ -601,7 +601,7 @@ select.form-control {
 .detail-value {
     font-weight: 400;
     text-align: right;
-    color: var(--color-text-secondary);
+    color: white;
 }
 
 /* --- Highlighting Optimality Status --- */
@@ -1340,5 +1340,6 @@ header h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 
 
