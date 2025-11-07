@@ -10,10 +10,9 @@ const firebaseConfig = {
   measurementId: "G-MRF4NFPTZH"
 };
 
-// Initialize Firebase (comment out if you don't have credentials yet)
+// Initialize Firebase 
 let database = null;
 try {
-  // Uses v8 compat syntax which works with the scripts in index.html
   firebase.initializeApp(firebaseConfig);
   database = firebase.database();
   console.log('Firebase initialized successfully');
@@ -844,4 +843,5 @@ speedSlider.addEventListener('input', (e) => {
 
 // Initialize on load
 initGrid();
+
 
