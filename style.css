@@ -782,7 +782,7 @@ select.form-control {
     format('woff2');
 }
 
-/* END PERPLEXITY DESIGN SYSTEM */
+/* *
 :root {
   /* Primitive Color Tokens */
   --color-white: rgba(255, 255, 255, 1);
@@ -1340,6 +1340,7 @@ header h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 
 
 
